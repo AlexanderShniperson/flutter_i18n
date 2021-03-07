@@ -7,15 +7,16 @@ import 'package:flutter_i18n/widgets/I18nText.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 Future main() async {
-  final FlutterI18nDelegate flutterI18nDelegate = FlutterI18nDelegate(
+  final flutterI18nDelegate = FlutterI18nDelegate(
     translationLoader: FileTranslationLoader(
-        useCountryCode: false,
-        fallbackFile: 'en',
-        basePath: 'assets/i18n',
-        forcedLocale: Locale('es')),
+      useCountryCode: false,
+      fallbackFile: 'en',
+      basePath: 'assets/i18n',
+      forcedLocale: Locale('es'),
+    ),
   );
   WidgetsFlutterBinding.ensureInitialized();
-  await flutterI18nDelegate.load(null);
+  flutterI18nDelegate.load(null);
   runApp(MyApp(flutterI18nDelegate));
 }
 
@@ -26,18 +27,37 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(),
-      localizationsDelegates: [
-        flutterI18nDelegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate
-      ],
-      builder: FlutterI18n.rootAppBuilder(),
+    return Builder(
+      builder: (ctx) {
+        return StreamBuilder<bool>(
+          stream: FlutterI18n.isLoadedStream,
+          builder: (_, snapshot) {
+            if (snapshot.data ?? false == true) {
+              return MaterialApp(
+                title: 'Flutter Demo',
+                theme: ThemeData(
+                  primarySwatch: Colors.blue,
+                ),
+                home: MyHomePage(),
+                localizationsDelegates: [
+                  flutterI18nDelegate,
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate
+                ],
+                builder: FlutterI18n.rootAppBuilder(),
+              );
+            } else {
+              return Container(
+                child: Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                  ),
+                ),
+              );
+            }
+          },
+        );
+      },
     );
   }
 }
@@ -61,11 +81,10 @@ class MyHomeState extends State<MyHomePage> {
     });
   }
 
-  changeLanguage() async {
+  void changeLanguage() {
     currentLang =
         currentLang.languageCode == 'en' ? Locale('it') : Locale('en');
-    await FlutterI18n.refresh(context, currentLang);
-    setState(() {});
+    FlutterI18n.refresh(context, currentLang);
   }
 
   incrementCounter() {
@@ -96,12 +115,16 @@ class MyHomeState extends State<MyHomePage> {
                       fallbackKey: "button.label.clickMe"))),
               TextButton(
                   key: Key('changeLanguage'),
-                  onPressed: () async {
-                    await changeLanguage();
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text(FlutterI18n.translate(
-                          context, "button.toastMessage")),
-                    ));
+                  onPressed: () {
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(
+                          content: Text(FlutterI18n.translate(
+                              context, "button.toastMessage")),
+                        ))
+                        .closed
+                        .then((value) {
+                      changeLanguage();
+                    });
                   },
                   child: Text(
                       FlutterI18n.translate(context, "button.label.language")))

@@ -18,8 +18,14 @@ class CustomNetworkFileTranslationLoader extends NetworkFileTranslationLoader {
 Future main() async {
   final FlutterI18nDelegate flutterI18nDelegate = FlutterI18nDelegate(
     translationLoader: CustomNetworkFileTranslationLoader(
-      baseUri: Uri.https("postman-echo.com", "get",
-          {"title": "Basic network example", "content": "Translated content"}),
+      baseUri: Uri.https(
+        "postman-echo.com",
+        "get",
+        {
+          "title": "Basic network example",
+          "content": "Translated content",
+        },
+      ),
     ),
   );
 
@@ -55,25 +61,27 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(FlutterI18n.translate(context, "args.title"))),
-      body: Builder(builder: (BuildContext context) {
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              StreamBuilder<bool>(
-                stream: FlutterI18n.retrieveLoadedStream(context),
-                builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-                  return Text("isLoading: ${snapshot.data}");
-                },
-              ),
-              I18nText(
-                "args.content",
-                child: Text(""),
-              ),
-            ],
-          ),
-        );
-      }),
+      body: Builder(
+        builder: (BuildContext context) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                StreamBuilder<bool>(
+                  stream: FlutterI18n.isLoadedStream,
+                  builder: (context, snapshot) {
+                    return Text("isLoading: ${snapshot.data}");
+                  },
+                ),
+                I18nText(
+                  "args.content",
+                  child: Text(""),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }

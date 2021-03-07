@@ -4,14 +4,14 @@ description: Demonstrates how to use the flutter_i18n plugin.
 publish_to: 'none'
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.10.5 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
   flutter_i18n:
     path: ../
-  cupertino_icons: ^1.0.2
+  cupertino_icons: ^1.0.0
   http:
   path_provider:
 

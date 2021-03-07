@@ -10,6 +10,8 @@ abstract class TranslationLoader {
   /// Load method to implement
   Future<Map> load();
 
+  Map<dynamic, dynamic> getTranslation();
+
   Locale? _forcedLocale, _locale;
 
   /// Used to force the locale to load
