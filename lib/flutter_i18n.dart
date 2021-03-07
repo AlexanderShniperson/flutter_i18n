@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart' as Foundation;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_i18n/loaders/file_translation_loader.dart';
 import 'package:flutter_i18n/loaders/translation_loader.dart';
+import 'package:flutter_i18n/utils/loading_status_stream.dart';
 import 'package:flutter_i18n/utils/plural_translator.dart';
 import 'package:flutter_i18n/utils/simple_translator.dart';
 import 'package:intl/intl.dart' as intl;
@@ -22,22 +23,24 @@ typedef void MissingTranslationHandler(String key, Locale locale);
 
 /// Facade used to hide the loading and translations logic
 class FlutterI18n {
-   TranslationLoader translationLoader;
-   MissingTranslationHandler missingTranslationHandler;
+  TranslationLoader translationLoader;
+  MissingTranslationHandler missingTranslationHandler;
   String keySeparator;
 
   Map<dynamic, dynamic> get decodedMap => translationLoader.getTranslation();
 
   // ignore: close_sinks
-  final _localeStream = StreamController<Locale>.broadcast();
+  static final _localeStream = StreamController<Locale>.broadcast();
 
-  // ignore: close_sinks
-  static final _loadingStream = StreamController<LoadingStatus>.broadcast();
+  static Stream<Locale> get localeStream => _localeStream.stream;
 
-  static Stream<LoadingStatus> get loadingStream => _loadingStream.stream;
+  static final loadingStream = LoadingStatusStream();
 
-  static Stream<bool> get isLoadedStream => loadingStream
-      .asyncMap((loadingStatus) => loadingStatus == LoadingStatus.loaded);
+  static Stream<bool> get isLoadedStream => loadingStream.stream
+      .map((loadingStatus) => loadingStatus == LoadingStatus.loaded);
+
+  static Future<bool> get isLoadedFuture =>
+      loadingStream.stream.any((e) => e == LoadingStatus.loaded);
 
   FlutterI18n(
     TranslationLoader translationLoader,
@@ -45,7 +48,6 @@ class FlutterI18n {
     MissingTranslationHandler missingTranslationHandler,
   }) {
     this.translationLoader = translationLoader ?? FileTranslationLoader();
-    _loadingStream.add(LoadingStatus.notLoaded);
     this.missingTranslationHandler =
         missingTranslationHandler ?? (key, locale) {};
     this.keySeparator = keySeparator;
@@ -55,12 +57,12 @@ class FlutterI18n {
   /// Used to load the locale translation file
   Future<bool> load() async {
     try {
-      _loadingStream.sink.add(LoadingStatus.notLoaded);
+      loadingStream.setState(LoadingStatus.notLoaded);
       await translationLoader.load();
       _localeStream.sink.add(locale);
-      _loadingStream.sink.add(LoadingStatus.loaded);
+      loadingStream.setState(LoadingStatus.loaded);
       return true;
-    } on Exception catch (e) {
+    } catch (e) {
       return false;
     }
   }
@@ -136,10 +138,8 @@ class FlutterI18n {
   /// Build for root widget, to support RTL languages
   static Function(BuildContext, Widget) rootAppBuilder() {
     return (BuildContext context, Widget child) {
-      final instance = _retrieveCurrentInstance(context);
       return StreamBuilder<Locale>(
-        initialData: instance?.locale,
-        stream: instance?._localeStream?.stream,
+        stream: localeStream,
         builder: (context, snapshot) {
           return Directionality(
             textDirection: _findTextDirection(snapshot.data),
