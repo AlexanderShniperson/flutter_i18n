@@ -9,6 +9,9 @@ class FlutterI18nDelegate extends LocalizationsDelegate<FlutterI18n> {
 
   Locale get currentLocale => _translationObject?.translationLoader?.locale;
 
+  Map<dynamic, dynamic> get currentTranslation =>
+      _translationObject?.decodedMap;
+
   FlutterI18nDelegate({
     translationLoader,
     MissingTranslationHandler missingTranslationHandler,
@@ -30,7 +33,7 @@ class FlutterI18nDelegate extends LocalizationsDelegate<FlutterI18n> {
   Future<FlutterI18n> load(final Locale locale) async {
     MessagePrinter.info("New locale: $locale, currentLocale: $currentLocale");
     final translationLoader = _translationObject.translationLoader;
-    if (//translationLoader.locale != locale ||
+    if ( //translationLoader.locale != locale ||
         _translationObject.decodedMap.isEmpty) {
       translationLoader.locale = locale;
       await _translationObject.load();

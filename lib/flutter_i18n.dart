@@ -44,7 +44,6 @@ class FlutterI18n {
     String keySeparator, {
     MissingTranslationHandler missingTranslationHandler,
   }) {
-    print("FlutterI18n(${identityHashCode(this)}) create instance");
     this.translationLoader = translationLoader ?? FileTranslationLoader();
     _loadingStream.add(LoadingStatus.notLoaded);
     this.missingTranslationHandler =
