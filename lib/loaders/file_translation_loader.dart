@@ -18,9 +18,9 @@ class FileTranslationLoader extends TranslationLoader implements IFileContent {
   AssetBundle assetBundle = rootBundle;
 
   Map<dynamic, dynamic> _decodedMap = Map();
-  late List<BaseDecodeStrategy> _decodeStrategies;
+  List<BaseDecodeStrategy> _decodeStrategies;
 
-  set decodeStrategies(List<BaseDecodeStrategy>? decodeStrategies) =>
+  set decodeStrategies(List<BaseDecodeStrategy> decodeStrategies) =>
       _decodeStrategies = decodeStrategies ??
           [
             JsonDecodeStrategy(),
@@ -87,7 +87,7 @@ class FileTranslationLoader extends TranslationLoader implements IFileContent {
   /// Load the fileName using one of the strategies provided
   @protected
   Future<Map> loadFile(final String fileName) async {
-    final List<Future<Map?>> strategiesFutures = _executeStrategies(fileName);
+    final List<Future<Map>> strategiesFutures = _executeStrategies(fileName);
     final strategies = await Future.wait(strategiesFutures);
     return strategies.firstWhere(
           (map) => map != null,
@@ -96,22 +96,22 @@ class FileTranslationLoader extends TranslationLoader implements IFileContent {
         Map();
   }
 
-  List<Future<Map?>> _executeStrategies(final String fileName) {
+  List<Future<Map>> _executeStrategies(final String fileName) {
     return _decodeStrategies.map((e) => e.decode(fileName, this)).toList();
   }
 
   /// Compose the file name using the format languageCode_countryCode
   @protected
   String composeFileName() {
-    return "${locale!.languageCode}${composeCountryCode()}";
+    return "${locale.languageCode}${composeCountryCode()}";
   }
 
   /// Return the country code to attach to the file name, if required
   @protected
   String composeCountryCode() {
     String countryCode = "";
-    if (useCountryCode && locale!.countryCode != null) {
-      countryCode = "_${locale!.countryCode}";
+    if (useCountryCode && locale.countryCode != null) {
+      countryCode = "_${locale.countryCode}";
     }
     return countryCode;
   }

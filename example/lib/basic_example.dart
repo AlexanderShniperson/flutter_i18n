@@ -116,7 +116,7 @@ class MyHomeState extends State<MyHomePage> {
               TextButton(
                   key: Key('changeLanguage'),
                   onPressed: () {
-                    ScaffoldMessenger.of(context)
+                    Scaffold.of(context)
                         .showSnackBar(SnackBar(
                           content: Text(FlutterI18n.translate(
                               context, "button.toastMessage")),

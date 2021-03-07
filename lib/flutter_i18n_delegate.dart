@@ -5,13 +5,13 @@ import 'flutter_i18n.dart';
 
 /// Translation delegate that manage the new locale received from the framework
 class FlutterI18nDelegate extends LocalizationsDelegate<FlutterI18n> {
-  static FlutterI18n? _translationObject;
+  static FlutterI18n _translationObject;
 
-  Locale? get currentLocale => _translationObject?.translationLoader.locale;
+  Locale get currentLocale => _translationObject?.translationLoader?.locale;
 
   FlutterI18nDelegate({
     translationLoader,
-    MissingTranslationHandler? missingTranslationHandler,
+    MissingTranslationHandler missingTranslationHandler,
     String keySeparator = ".",
   }) {
     _translationObject = FlutterI18n(
@@ -29,13 +29,13 @@ class FlutterI18nDelegate extends LocalizationsDelegate<FlutterI18n> {
   @override
   Future<FlutterI18n> load(final Locale locale) async {
     MessagePrinter.info("New locale: $locale, currentLocale: $currentLocale");
-    final translationLoader = _translationObject!.translationLoader;
+    final translationLoader = _translationObject.translationLoader;
     if (//translationLoader.locale != locale ||
-        _translationObject!.decodedMap.isEmpty) {
+        _translationObject.decodedMap.isEmpty) {
       translationLoader.locale = locale;
-      await _translationObject!.load();
+      await _translationObject.load();
     }
-    return _translationObject!;
+    return _translationObject;
   }
 
   @override

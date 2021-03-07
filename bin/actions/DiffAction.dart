@@ -53,7 +53,7 @@ class DiffAction extends AbstractAction {
     }
   }
 
-  Future<Map?> retrieveFileContent(
+  Future<Map> retrieveFileContent(
       final List<FileSystemEntity> assetsContent, final String fileToRetrieve) {
     final FileSystemEntity fileSystemEntity =
         retrieveEntity(assetsContent, fileToRetrieve);

@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_i18n/loaders/decoders/xml_decode_strategy.dart';
 import 'package:flutter_i18n/loaders/decoders/yaml_decode_strategy.dart';
@@ -108,7 +109,7 @@ class TestXmlLoader extends FileTranslationLoader {
 
 class TestNamespaceLoader extends NamespaceFileTranslationLoader {
   TestNamespaceLoader({
-    required namespaces,
+    @required namespaces,
     forcedLocale,
     fallbackDir = "en",
     basePath = "assets/flutter_i18n",
